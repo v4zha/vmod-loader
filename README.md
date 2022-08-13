@@ -2,9 +2,7 @@
 
 **Vazha Mod Loader** 
 is a module bundler to bundle neovim config files written in lua<br>
-Vazha Mod Loader is written in haskell
-and provides config file to edit module path,
-required modules and bundled file name
+Vazha Mod Loader provides a fast bundler which looks for modules descibed in the configuration file and bundles all the modules with path namespace in a single lua script
 <br>
 ![v4zha](assets/v_mod.png)
 ## Current Features
