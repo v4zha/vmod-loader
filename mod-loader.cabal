@@ -6,11 +6,12 @@ version:            0.1.0.0
 -- synopsis:
 
 -- A longer description of the package.
--- description:
+description:
+            Vmodloader is a module bundler to bundle neovim config files written in lua
 
 -- A URL where users can report bugs.
--- bug-reports:
-
+bug-reports:
+    https://github.com/v4zha/vmod-loader
 -- The license under which the package is released.
 -- license:
 author:             v4zha
