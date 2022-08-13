@@ -6,6 +6,7 @@ Vazha Mod Loader is written in haskell
 and provides config file to edit module path,
 required modules and bundled file name
 <br>
+![v4zha](assets/v_mod.png)
 ## Current Features
 - Provides Configuration file to change config and rebundle<br>
 
@@ -16,5 +17,5 @@ required modules and bundled file name
 - Requires cabal 
 - Configure cabal build using cabal configure 
 ```bash
-     cabal build
+  cabal build
 ```
