@@ -17,7 +17,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
  <br>
 
 ## Installation
-- Download from release<br>
+- Download from [releases](https://github.com/v4zha/vmod-loader/releases/tag/Latest)<br>
 
 ## Build   
 - Requires cabal,ghc and necessary build tools.
