@@ -45,7 +45,7 @@ config =
   Config
     <$> strOption
       ( long "cfg"
-          <> value "~/.vmod/vmod.yml"
+          <> value "~/.config/vmod/vmod.yml"
           <> metavar "CFG_FILE"
           <> help "provide full path to the config file"
       )
