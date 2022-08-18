@@ -12,7 +12,9 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 - Provides Configuration file to change config and rebundle.<br>
 
 - Provides custom config path with the optional --cfg flag .
+
 <br>
+
 **Eg:**
 
  ```bash
