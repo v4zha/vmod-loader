@@ -33,7 +33,7 @@ executable vmod-loader
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
     build-depends:
-        base ^>= 4.12.0.0 ,
+        base >= 4.12.0.0 ,
         directory >= 1.3.3.0,
         filepath >= 1.4.2.1,
         yaml >= 0.11.8.0,

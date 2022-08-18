@@ -1,13 +1,18 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Vloader where
 
+import Control.Exception (try)
 import Data.List (intercalate, isSuffixOf)
 import Data.String (IsString (fromString))
 import Data.Text (Text, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
 import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), decode, decodeFileEither, prettyPrintParseException, (.:))
+import GHC.Base (IO (IO))
+import GHC.IO.Exception (IOException (IOError))
 import GHC.TypeLits (ErrorMessage (Text))
 import System.Directory (getDirectoryContents)
 import System.FilePath ()
@@ -19,6 +24,8 @@ data ModConfig = ModConfig
     modules :: [String]
   }
   deriving (Show)
+
+type ModName = String
 
 instance FromJSON ModConfig where
   parseJSON (Object o) =
@@ -32,14 +39,20 @@ border = concat $ replicate 30 "="
 
 getMods :: String -> String -> IO String
 getMods mod_path mod_name = do
-  dir_files <- getDirectoryContents $ mod_path ++ "/" ++ mod_name
+  dir_files <- try . getDirectoryContents $ mod_path ++ "/" ++ mod_name :: IO (Either IOError [FilePath])
+  case dir_files of
+    Right mods -> return $modgen mod_name mods
+    Left err -> "" <$ putStrLn ("\nError parsing Module : " ++ mod_name ++ "\n>> [Error]: " ++ show err ++ "\n")
+
+modgen :: String -> [FilePath] -> String
+modgen mod_name dir_files =
   let mod_files = filter (isSuffixOf ".lua") dir_files
       header = ["-- " ++ border, "--    MOD : " ++ mod_name, "-- " ++ border]
-      lua_mods = map (\mod -> "require(\"" ++ mod_name ++ "." ++ mod ++ "\")") mod_files
+      lua_mods = map (\mod -> "require(\"" ++ mod_name ++ "." ++ fromMaybeMod (sanitizeLua mod) ++ "\")") mod_files
       lua_res = header ++ lua_mods
-  return $intercalate "\n" lua_res
+   in intercalate "\n" lua_res
 
-writeMods :: [String] -> String -> IO ()
+writeMods :: [ModName] -> String -> IO ()
 writeMods lua_mods res_file =
   writeFile (res_file ++ ".lua") $intercalate "\n" $banner ++ lua_mods
   where
@@ -55,11 +68,23 @@ getConfig conf_file = do
 sanitizePath :: ModConfig -> Maybe ModConfig
 sanitizePath ModConfig {mod_path, res_file, modules} =
   do
-    let res = fromString res_file
-        md_p
+    let md_p
           | last mod_path == '/' = init mod_path
           | otherwise = mod_path
         res_f
-          | ".lua" `isSuffixOf` res_file = unpack <$> stripSuffix ".lua" res
+          | ".lua" `isSuffixOf` res_file = sanitizeLua res_file
           | otherwise = Just res_file
     res_f >>= (\res -> Just $ ModConfig md_p res modules)
+
+sanitizeLua :: String -> Maybe ModName
+sanitizeLua mod_file = unpack <$> stripSuffix ".lua" (fromString mod_file)
+
+fromMaybeMod :: Maybe ModName -> ModName
+fromMaybeMod = \case
+  Just mod -> mod
+  Nothing -> error "Unable to remove lua extension "
+
+fromMaybeConfig :: Maybe ModConfig -> ModConfig
+fromMaybeConfig = \case
+  Just mod -> mod
+  Nothing -> error "Unable to parse Config"

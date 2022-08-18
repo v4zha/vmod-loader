@@ -6,6 +6,8 @@ import Data.Maybe (fromJust)
 import Vbanner (vModBanner)
 import Vloader
   ( ModConfig (ModConfig, mod_path, modules, res_file),
+    fromMaybeConfig,
+    fromMaybeMod,
     getConfig,
     getMods,
     sanitizePath,
@@ -15,7 +17,7 @@ import Vloader
 main :: IO ()
 main = do
   mod_ls <- sanitizePath <$> getConfig "./config.yml"
-  let mod_conf = fromJust mod_ls
+  let mod_conf = fromMaybeConfig mod_ls
   putStrLn vModBanner
   putStrLn "[*] : Getting Modules : "
   mapM_ (putStrLn . ("   >> " ++)) . modules $mod_conf
