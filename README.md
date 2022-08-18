@@ -13,7 +13,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 
 - Provides custom config path with the optional --cfg flag .
 <br>
-__Eg:__ 
+**Eg:**
 
  ```bash
     vmod_loader --cfg ./v4zha.yml
