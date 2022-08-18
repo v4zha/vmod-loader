@@ -8,13 +8,14 @@ module Vloader where
 import Control.Exception (try)
 import Data.List (intercalate, isSuffixOf)
 import Data.String (IsString (fromString))
-import Data.Text (Text, stripSuffix, unpack)
+import Data.Text (Text, replace, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
 import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), YamlException, decode, decodeFileEither, prettyPrintParseException, (.:))
 import GHC.Base (IO (IO))
 import GHC.IO.Exception (IOException (IOError))
-import GHC.TypeLits (ErrorMessage (Text))
-import System.Directory (getDirectoryContents)
+import GHC.TypeLits (ErrorMessage)
+import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, info, long, metavar, progDesc, short, strOption, value, (<**>))
+import System.Directory (getDirectoryContents, getHomeDirectory)
 import System.FilePath ()
 import System.IO ()
 
@@ -35,6 +36,30 @@ instance FromJSON ModConfig where
       <*> o .: "modules"
   parseJSON _ = error "Error Parsing Config file "
 
+newtype Config = Config
+  { conf_file :: String
+  }
+
+config :: Parser Config
+config =
+  Config
+    <$> strOption
+      ( long "cfg"
+          <> value "~/.vmod/vmod.yml"
+          <> metavar "CFG_FILE"
+          <> help "provide full path to the config file"
+      )
+
+getOpts :: ParserInfo Config
+getOpts =
+  info
+    (config <**> helper)
+    ( fullDesc
+        <> progDesc "VmodLoader is used to bundle lua modules"
+        <> header "V Mod Loader -Lua Module Bundler"
+    )
+
+border :: [Char]
 border = concat $ replicate 30 "="
 
 getMods :: String -> String -> IO String
@@ -60,9 +85,10 @@ writeMods lua_mods res_file =
 
 getConfig :: FilePath -> IO ModConfig
 getConfig conf_file = do
-  file <- decodeFileEither conf_file :: IO (Either ParseException ModConfig)
+  home <- getHomeDirectory
+  file <- decodeFileEither (sanitizeConf conf_file home) :: IO (Either ParseException ModConfig)
   case file of
-    Left pe -> error $ " ** Config Error.\n>> Ensure that the config is placed in ~/.vmod/vmod.yml\n\n [Error] : \n  >>" ++ prettyPrintParseException pe
+    Left pe -> error $ " ** Config Error.\n>> Ensure that the config is in the specified directory \n\n [Error] : \n  >>" ++ prettyPrintParseException pe
     Right mc -> return mc
 
 sanitizePath :: ModConfig -> Maybe ModConfig
@@ -78,6 +104,13 @@ sanitizePath ModConfig {mod_path, res_file, modules} =
 
 sanitizeLua :: String -> Maybe ModName
 sanitizeLua mod_file = unpack <$> stripSuffix ".lua" (fromString mod_file)
+
+sanitizeConf :: FilePath -> FilePath -> FilePath
+sanitizeConf conf_path home =
+  unpack $replace "~" home_file conf_file
+  where
+    home_file = fromString home
+    conf_file = fromString conf_path
 
 fromMaybeMod :: Maybe ModName -> ModName
 fromMaybeMod = \case
