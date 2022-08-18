@@ -2,7 +2,9 @@
 
 module Main where
 
+import Control.Exception (try)
 import Data.Maybe (fromJust)
+import System.Directory (getHomeDirectory)
 import Vbanner (vModBanner)
 import Vloader
   ( ModConfig (ModConfig, mod_path, modules, res_file),
@@ -16,9 +18,10 @@ import Vloader
 
 main :: IO ()
 main = do
-  mod_ls <- sanitizePath <$> getConfig "./config.yml"
-  let mod_conf = fromMaybeConfig mod_ls
   putStrLn vModBanner
+  home <- getHomeDirectory
+  mod_ls <- sanitizePath <$> getConfig (home ++ "/.vmod/vmod.yml")
+  let mod_conf = fromMaybeConfig mod_ls
   putStrLn "[*] : Getting Modules : "
   mapM_ (putStrLn . ("   >> " ++)) . modules $mod_conf
   lua_mods <- mapM (getMods $mod_path mod_conf) . modules $mod_conf

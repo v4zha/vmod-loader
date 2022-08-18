@@ -10,7 +10,7 @@ import Data.List (intercalate, isSuffixOf)
 import Data.String (IsString (fromString))
 import Data.Text (Text, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
-import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), decode, decodeFileEither, prettyPrintParseException, (.:))
+import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), YamlException, decode, decodeFileEither, prettyPrintParseException, (.:))
 import GHC.Base (IO (IO))
 import GHC.IO.Exception (IOException (IOError))
 import GHC.TypeLits (ErrorMessage (Text))
@@ -62,7 +62,7 @@ getConfig :: FilePath -> IO ModConfig
 getConfig conf_file = do
   file <- decodeFileEither conf_file :: IO (Either ParseException ModConfig)
   case file of
-    Left pe -> error $prettyPrintParseException pe
+    Left pe -> error $ " ** Config Error.\n>> Ensure that the config is placed in ~/.vmod/vmod.yml\n\n [Error] : \n  >>" ++ prettyPrintParseException pe
     Right mc -> return mc
 
 sanitizePath :: ModConfig -> Maybe ModConfig
@@ -87,4 +87,4 @@ fromMaybeMod = \case
 fromMaybeConfig :: Maybe ModConfig -> ModConfig
 fromMaybeConfig = \case
   Just mod -> mod
-  Nothing -> error "Unable to parse Config"
+  Nothing -> error "Unable to parse Config .Please Ensure that the config contains required fields\n"
