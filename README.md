@@ -14,11 +14,13 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 - Provides custom config path with the optional --cfg flag .
 <br>
 __Eg:__ 
+
  ```bash
     vmod_loader --cfg ./v4zha.yml
  ```
 - Default config location ~/.vmod/vmod.yml
 - required config fields 
+
 ```yml
       #Path where Neovim lua modules are located
       #Eg : /home/v4zha/.config/nvim/lua/v4zha
