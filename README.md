@@ -20,7 +20,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
  ```bash
     vmod --cfg ./v4zha.yml
  ```
-- Default config location ~/.vmod/vmod.yml
+- Default config location ~/.config/vmod/vmod.yml
 - required config fields 
 
 ```yml
