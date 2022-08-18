@@ -18,25 +18,25 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 **Eg:**
 
  ```bash
-    vmod_loader --cfg ./v4zha.yml
+    vmod --cfg ./v4zha.yml
  ```
 - Default config location ~/.vmod/vmod.yml
 - required config fields 
 
 ```yml
-      #Path where Neovim lua modules are located
-      #Eg : /home/v4zha/.config/nvim/lua/v4zha
-      mod_path: 
-          /home/v4zha/.config/nvim/lua/
-      #PATH to the New module_bundled lua script 
-      res_file: 
-          /home/v4zha/.config/nvim/lua/vmod_loader.lua
-      #List the modules
-      #Eg : 
-      modules : 
-        -colorsheme
-        -keybinds
-        -plugin_config
+     #Path where Neovim lua modules are located
+     #Eg : ~/.config/nvim/lua/v4zha
+     mod_path: 
+       ~/.config/nvim/lua/v4zha
+     #PATH to the New module_bundled lua script 
+     res_file: 
+       ~/.config/nvim/lua/v4zha/vmod.lua
+     #List the modules
+     #Eg : 
+     modules : 
+       - colorsheme
+       - plugins
+       - plugin_config
 ```
 <br>
 
