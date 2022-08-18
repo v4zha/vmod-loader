@@ -5,6 +5,7 @@ module Main where
 import Control.Exception (try)
 import Data.Maybe (fromJust)
 import Options.Applicative (execParser)
+import System.Directory (getHomeDirectory)
 import Vbanner (vModBanner)
 import Vloader
   ( Config (conf_file),
@@ -14,6 +15,7 @@ import Vloader
     getConfig,
     getMods,
     getOpts,
+    replaceHome,
     sanitizePath,
     writeMods,
   )
@@ -26,10 +28,13 @@ main = greeter =<< execParser opts
     greeter config =
       do
         putStrLn vModBanner
+        home <- getHomeDirectory
         mod_ls <- sanitizePath <$> getConfig (conf_file config)
         let mod_conf = fromMaybeConfig mod_ls
+        let res = replaceHome (res_file mod_conf) home
+        let mods = replaceHome (mod_path mod_conf) home
         putStrLn "[*] : Getting Modules : "
         mapM_ (putStrLn . ("   >> " ++)) . modules $mod_conf
-        lua_mods <- mapM (getMods $mod_path mod_conf) . modules $mod_conf
-        putStrLn $ "[*] : Writing to file : " ++ res_file mod_conf ++ ".lua"
-        writeMods lua_mods $res_file mod_conf
+        lua_mods <- mapM (getMods mods) . modules $mod_conf
+        putStrLn $ "[*] : Writing to file : " ++ res ++ ".lua"
+        writeMods lua_mods res

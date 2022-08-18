@@ -11,10 +11,34 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
   
 - Provides Configuration file to change config and rebundle.<br>
 
-## Todo 
+- Provides custom config path with the optional --cfg flag .
 
-- Provide custom config path , as of now the config file should be in the same dir as the binary and should have file name of `config.yml` .
- <br>
+<br>
+
+**Eg:**
+
+ ```bash
+    vmod --cfg ./v4zha.yml
+ ```
+- Default config location ~/.config/vmod/vmod.yml
+- required config fields 
+
+```yml
+     #Path where Neovim lua modules are located
+     #Eg : ~/.config/nvim/lua/v4zha
+     mod_path: 
+       ~/.config/nvim/lua/v4zha
+     #PATH to the New module_bundled lua script 
+     res_file: 
+       ~/.config/nvim/lua/v4zha/vmod.lua
+     #List the modules
+     #Eg : 
+     modules : 
+       - colorsheme
+       - plugins
+       - plugin_config
+```
+<br>
 
 ## Installation
 - Download from [releases](https://github.com/v4zha/vmod-loader/releases/tag/Latest)<br>

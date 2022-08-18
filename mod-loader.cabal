@@ -22,7 +22,7 @@ maintainer:         arvin_j4848@protonmail.com
 -- category:
 extra-source-files: CHANGELOG.md
 
-executable vmod-loader
+executable vmod
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.

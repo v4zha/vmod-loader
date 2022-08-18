@@ -45,7 +45,7 @@ config =
   Config
     <$> strOption
       ( long "cfg"
-          <> value "~/.vmod/vmod.yml"
+          <> value "~/.config/vmod/vmod.yml"
           <> metavar "CFG_FILE"
           <> help "provide full path to the config file"
       )
@@ -86,7 +86,7 @@ writeMods lua_mods res_file =
 getConfig :: FilePath -> IO ModConfig
 getConfig conf_file = do
   home <- getHomeDirectory
-  file <- decodeFileEither (sanitizeConf conf_file home) :: IO (Either ParseException ModConfig)
+  file <- decodeFileEither (replaceHome conf_file home) :: IO (Either ParseException ModConfig)
   case file of
     Left pe -> error $ " ** Config Error.\n>> Ensure that the config is in the specified directory \n\n [Error] : \n  >>" ++ prettyPrintParseException pe
     Right mc -> return mc
@@ -105,8 +105,8 @@ sanitizePath ModConfig {mod_path, res_file, modules} =
 sanitizeLua :: String -> Maybe ModName
 sanitizeLua mod_file = unpack <$> stripSuffix ".lua" (fromString mod_file)
 
-sanitizeConf :: FilePath -> FilePath -> FilePath
-sanitizeConf conf_path home =
+replaceHome :: FilePath -> FilePath -> FilePath
+replaceHome conf_path home =
   unpack $replace "~" home_file conf_file
   where
     home_file = fromString home
