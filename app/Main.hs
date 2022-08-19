@@ -9,7 +9,7 @@ import System.Directory (getHomeDirectory)
 import Vbanner (vModBanner)
 import Vloader
   ( Config (conf_file),
-    ModConfig (ModConfig, mod_path, modules, res_file),
+    ModConfig (ModConfig, modPath, modules, resFile),
     fromMaybeConfig,
     fromMaybeMod,
     getConfig,
@@ -29,11 +29,11 @@ main = greeter =<< execParser opts
       do
         putStrLn vModBanner
         home <- getHomeDirectory
-        mod_ls <- sanitizePath <$> getConfig (conf_file config)
-        let mod_conf = fromMaybeConfig mod_ls
-        let [res, mods] = replaceHome home <$> [res_file mod_conf, mod_path mod_conf]
+        modLs <- sanitizePath <$> getConfig (conf_file config)
+        let modConf = fromMaybeConfig modLs
+        let [res, mods] = replaceHome home <$> [resFile modConf, modPath modConf]
         putStrLn "[*] : Getting Modules : "
-        mapM_ (putStrLn . ("   >> " ++)) . modules $mod_conf
-        lua_mods <- mapM (getMods mods) . modules $mod_conf
+        mapM_ (putStrLn . ("   >> " ++)) . modules $modConf
+        lua_mods <- mapM (getMods mods) . modules $modConf
         putStrLn $ "[*] : Writing to file : " ++ res ++ ".lua"
         writeMods lua_mods res
