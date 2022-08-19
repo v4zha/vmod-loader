@@ -86,7 +86,7 @@ writeMods lua_mods res_file =
 getConfig :: FilePath -> IO ModConfig
 getConfig conf_file = do
   home <- getHomeDirectory
-  file <- decodeFileEither (replaceHome conf_file home) :: IO (Either ParseException ModConfig)
+  file <- decodeFileEither (replaceHome home conf_file) :: IO (Either ParseException ModConfig)
   case file of
     Left pe -> error $ " ** Config Error.\n>> Ensure that the config is in the specified directory \n\n [Error] : \n  >>" ++ prettyPrintParseException pe
     Right mc -> return mc
@@ -106,11 +106,10 @@ sanitizeLua :: String -> Maybe ModName
 sanitizeLua mod_file = unpack <$> stripSuffix ".lua" (fromString mod_file)
 
 replaceHome :: FilePath -> FilePath -> FilePath
-replaceHome conf_path home =
+replaceHome home conf_path =
   unpack $replace "~" home_file conf_file
   where
-    home_file = fromString home
-    conf_file = fromString conf_path
+    [home_file, conf_file] = fromString <$> [home, conf_path]
 
 fromMaybeMod :: Maybe ModName -> ModName
 fromMaybeMod = \case
