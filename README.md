@@ -49,3 +49,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 ```bash
   cabal build
 ```
+to run the binary with arguments in cabal
+```bash
+  cabal run vmod -- --cfg /location/to/config.yml
+```
