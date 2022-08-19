@@ -18,6 +18,9 @@ import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, 
 import System.Directory (getDirectoryContents, getHomeDirectory)
 import System.FilePath ()
 import System.IO ()
+import Text.Termcolor (format)
+import qualified Text.Termcolor.Foreground as F
+import Text.Termcolor.Style (bold)
 
 data ModConfig = ModConfig
   { modPath :: String,
@@ -67,7 +70,7 @@ getMods modPath modName = do
   dirFiles <- try . getDirectoryContents $ modPath ++ "/" ++ modName :: IO (Either IOError [FilePath])
   case dirFiles of
     Right mods -> return $modgen modName mods
-    Left err -> "" <$ putStrLn ("\nError parsing Module : " ++ modName ++ "\n>> [Error]: " ++ show err ++ "\n")
+    Left err -> "" <$ (putStrLn . format . bold . F.red . read $("\nError parsing Module : " ++ modName ++ "\n>> [Error]: " ++ show err ++ "\n"))
 
 modgen :: String -> [FilePath] -> String
 modgen modName dirFiles =
