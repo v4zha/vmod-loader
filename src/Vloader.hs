@@ -92,7 +92,7 @@ getModPrefix :: FilePath -> String
 getModPrefix modPath =
   let paths = map unpack $splitOn (pack "/") (pack modPath)
       fetchPrefix :: [String] -> Bool -> String
-      fetchPrefix [] False = ""
+      fetchPrefix [] _= ""
       fetchPrefix (x : xs) False
         | x == "lua" = fetchPrefix xs True
         | otherwise = fetchPrefix xs False
