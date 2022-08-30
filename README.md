@@ -7,6 +7,9 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 <br><br>
 ![v4zha](assets/v_mod.png)
 
+![vmod](assets/v_mod1.png)
+
+
 ## Current Features
   
 - Provides Configuration file to change config and rebundle.<br>
