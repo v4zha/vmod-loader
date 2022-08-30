@@ -7,7 +7,7 @@
 module Vloader where
 
 import Control.Exception (try)
-import Data.List (intercalate, isSuffixOf)
+import Data.List (foldl', intercalate, isSuffixOf)
 import Data.String (IsString (fromString))
 import Data.Text (Text, pack, replace, splitOn, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
@@ -92,11 +92,11 @@ getModPrefix :: FilePath -> String
 getModPrefix modPath =
   let paths = map unpack $splitOn (pack "/") (pack modPath)
       fetchPrefix :: [String] -> Bool -> String
-      fetchPrefix [] _= ""
+      fetchPrefix [] _ = ""
       fetchPrefix (x : xs) False
         | x == "lua" = fetchPrefix xs True
         | otherwise = fetchPrefix xs False
-      fetchPrefix (x : xs) True = intercalate "" $x : map ("." ++) xs ++ ["."]
+      fetchPrefix (x : xs) True = foldl' (\acc x -> acc ++ "." ++ x) x xs ++ "."
    in fetchPrefix paths False
 
 getConfig :: FilePath -> IO ModConfig
