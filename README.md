@@ -30,7 +30,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
        ~/.config/nvim/lua/v4zha
      #PATH to the New module_bundled lua script 
      res_file: 
-       ~/.config/nvim/lua/v4zha/vmod.lua
+       ~/.config/nvim/init.lua
      #List the modules
      #Eg : 
      modules : 

@@ -1,13 +1,12 @@
 #Path where Neovim lua modules are located
 #Eg : ~/.config/nvim/lua/v4zha
 mod_path: 
-   ~/.config/nvim/lua/v4zha
+   ~/.config/nvim/lua/v4zha/
 #PATH to the New module_bundled lua script 
 res_file: 
-   ~/.config/nvim/lua/v4zha/vmod.lua
+   ~/.config/nvim/init.lua
 #List the modules
 #Eg : 
 modules : 
-   - colorsheme
+   - general
    - plugins
-   - plugin_config
