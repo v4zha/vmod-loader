@@ -69,7 +69,6 @@ border = concat $ replicate 30 "="
 getMods :: FilePath -> String -> IO String
 getMods modPath modName = do
   let modPrefix = getModPrefix modPath
-  putStr $ "ModPrefix : " ++ modPrefix
   dirFiles <- try . getDirectoryContents $ modPath ++ "/" ++ modName :: IO (Either IOError [FilePath])
   case dirFiles of
     Right mods -> return $modgen modPrefix modName mods
