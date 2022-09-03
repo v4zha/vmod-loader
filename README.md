@@ -61,21 +61,21 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 ```
       📂 ~/.config/nvim
        ├── 📂 lua
-       ├── 📂 v4zha
-       │   ├── 📂 general
-       │   │   ├──📄 utils.lua
-       │   │   └──📄 colorscheme.lua
-       │   │
-       │   ├── 📂 keymaps
-       │   │   ├──  📄 leader.lua
-       │   │   ├──  📄 terminal.lua
-       │   │   └──  📄 general.lua
-       │   │
-       │   ├── 📂 plugin_config
-       │   │   ├── 📄 telescope.lua
-       │   │   └── 📄 toggleterm.lua
-       │   │
-       │   └── 📄 plugins.lua
+       │    └──📂 v4zha
+       │       ├──📂 general
+       │       │  ├── 📄 utils.lua
+       │       │  └── 📄 colorscheme.lua
+       │       │
+       │       ├──📂 keymaps
+       │       │  ├──  📄 leader.lua
+       │       │  ├──  📄 terminal.lua
+       │       │  └──  📄 general.lua
+       │       │
+       │       ├──📂 plugin_config
+       │       │  ├── 📄 telescope.lua
+       │       │  └── 📄 toggleterm.lua
+       │       │
+       │       └── 📄 plugins.lua
        │
        └── 📄 init.lua 
 ```
