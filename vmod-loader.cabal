@@ -47,7 +47,7 @@ executable vmod
     termcolor>=0.2.0.0,
     vmod-loader>=1.5.0
 
-Test-Suite test
+Test-Suite vmod-test
     type: exitcode-stdio-1.0
     ghc-options: -Wall
     hs-source-dirs: test 

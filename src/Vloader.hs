@@ -24,13 +24,14 @@ import System.IO ()
 import Text.Termcolor (format)
 import qualified Text.Termcolor.Foreground as F
 import Text.Termcolor.Style (bold)
+import Vbanner (vModBanner)
 
 data ModConfig = ModConfig
   { modPath :: String,
     resFile :: String,
     modules :: [String]
   }
-  deriving (Show,Eq)
+  deriving (Eq)
 
 type ModName = String
 
@@ -44,8 +45,10 @@ instance FromJSON ModConfig where
 
 data Config = Config
   { confFile :: String,
-    version :: Bool
-  } deriving (Show,Eq)
+    version :: Bool,
+    quiet :: Bool
+  }
+  deriving (Eq)
 
 config :: Parser Config
 config =
@@ -55,12 +58,17 @@ config =
           <> short 'f'
           <> value "~/.config/vmod/vmod.yml"
           <> metavar "CFG_FILE"
-          <> help "provide full path to the config file"
+          <> help "Provide full path to the config file"
       )
     <*> switch
       ( long "version"
           <> short 'v'
-          <> help "display Vmod version"
+          <> help "Display Vmod version"
+      )
+    <*> switch
+      ( long "quiet"
+          <> short 'q'
+          <> help "Doesnot display Banner"
       )
 
 getOpts :: ParserInfo Config
@@ -151,10 +159,16 @@ fromMaybeConfig = \case
   Just mod -> mod
   Nothing -> error "Unable to parse Config .Please Ensure that the config contains required fields\n"
 
-getVersion :: Bool -> IO ()
-getVersion value
-  | value =
-    do
-      putStrLn $format . bold . F.cyan . read $ "\tVmod Version : 1.5.0\n"
-      exitSuccess
-  | otherwise = return ()
+getVersion :: Bool -> Bool -> IO ()
+getVersion True q =
+  do
+    let version = "1.5.0"
+    case q of
+      False -> putStrLn $format . bold . F.cyan . read $ "\tVmod Version : " ++ version ++ "\n"
+      True -> putStrLn version
+    exitSuccess
+getVersion False _ = return ()
+
+getBanner :: Bool -> IO ()
+getBanner False = putStrLn . format . bold $ read vModBanner
+getBanner  _= return ()

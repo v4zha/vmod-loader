@@ -72,4 +72,13 @@ to run the binary with arguments in cabal
 
 ```bash
   cabal run vmod -- --cfg /location/to/config.yml
-  cabal run vmod -- -f /location/to/config.yml```
+  cabal run vmod -- -f /location/to/config.yml
+```
+
+## Test
+- Unit Tests can be found in test directory
+to run tests
+
+```bash
+  cabal test all
+```

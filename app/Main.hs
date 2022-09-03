@@ -7,13 +7,13 @@ import System.Directory (getHomeDirectory)
 import Text.Termcolor (format)
 import qualified Text.Termcolor.Foreground as F
 import Text.Termcolor.Style (bold)
-import Vbanner (vModBanner)
 import Vloader
-  ( Config (confFile, version),
+  ( Config (confFile, quiet, version),
     ModConfig (ModConfig, modPath, modules, resFile),
     config,
     fromMaybeConfig,
     fromMaybeMod,
+    getBanner,
     getConfig,
     getMods,
     getOpts,
@@ -31,8 +31,8 @@ main = greeter =<< execParser opts
     greeter :: Config -> IO ()
     greeter config =
       do
-        putStrLn . format . bold $ read vModBanner
-        getVersion $version config
+        getBanner $quiet config
+        getVersion (version config) (quiet config)
         home <- getHomeDirectory
         modLs <- sanitizePath <$> getConfig (confFile config)
         let modConf = fromMaybeConfig modLs
