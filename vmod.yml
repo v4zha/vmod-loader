@@ -8,5 +8,8 @@ res_file:
 #List the modules
 #Eg : 
 modules : 
-   - general
-   - plugins
+      - general 
+      #  - plugins
+      - plugin_config
+      # reads the mod_path for lua scripts : )
+      - .

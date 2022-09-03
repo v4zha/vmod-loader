@@ -13,10 +13,12 @@ import Data.Text (Text, pack, replace, splitOn, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
 import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), YamlException, decode, decodeFileEither, prettyPrintParseException, (.:))
 import GHC.Base (IO (IO))
+import GHC.Generics (Datatype (moduleName))
 import GHC.IO.Exception (IOException (IOError))
 import GHC.TypeLits (ErrorMessage)
-import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, info, long, metavar, progDesc, short, strOption, value, (<**>))
+import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, info, long, metavar, progDesc, short, strOption, switch, value, (<**>))
 import System.Directory (getDirectoryContents, getHomeDirectory)
+import System.Exit (exitSuccess)
 import System.FilePath ()
 import System.IO ()
 import Text.Termcolor (format)
@@ -28,7 +30,7 @@ data ModConfig = ModConfig
     resFile :: String,
     modules :: [String]
   }
-  deriving (Show)
+  deriving (Show,Eq)
 
 type ModName = String
 
@@ -40,18 +42,25 @@ instance FromJSON ModConfig where
       <*> o .: "modules"
   parseJSON _ = error "Error Parsing Config file "
 
-newtype Config = Config
-  { confFile :: String
-  }
+data Config = Config
+  { confFile :: String,
+    version :: Bool
+  } deriving (Show,Eq)
 
 config :: Parser Config
 config =
   Config
     <$> strOption
       ( long "cfg"
+          <> short 'f'
           <> value "~/.config/vmod/vmod.yml"
           <> metavar "CFG_FILE"
           <> help "provide full path to the config file"
+      )
+    <*> switch
+      ( long "version"
+          <> short 'v'
+          <> help "display Vmod version"
       )
 
 getOpts :: ParserInfo Config
@@ -71,14 +80,15 @@ getMods modPath modName = do
   let modPrefix = getModPrefix modPath
   dirFiles <- try . getDirectoryContents $ modPath ++ "/" ++ modName :: IO (Either IOError [FilePath])
   case dirFiles of
-    Right mods -> return $modgen modPrefix modName mods
+    Right mods -> return $modGen modPrefix modName mods
     Left err -> "" <$ (putStrLn . format . bold . F.red . read $("\nError parsing Module : " ++ modName ++ "\n>> [Error]: " ++ show err ++ "\n"))
 
-modgen :: String -> String -> [FilePath] -> String
-modgen modPrefix modName dirFiles =
+modGen :: String -> String -> [FilePath] -> String
+modGen modPrefix modN dirFiles =
   let modFiles = filter (isSuffixOf ".lua") dirFiles
-      header = ["-- " ++ border, "--    MOD : " ++ modName, "-- " ++ border]
-      luaMods = map (\mod -> "require(\"" ++ modPrefix ++ modName ++ "." ++ fromMaybeMod (sanitizeLua mod) ++ "\")") modFiles
+      (modHead, modName) = sanitizeMod modPrefix modN
+      header = ["-- " ++ border, "--    MOD : " ++ modHead, "-- " ++ border]
+      luaMods = map (\mod -> "require(\"" ++ modPrefix ++ modName ++ fromMaybeMod (sanitizeLua mod) ++ "\")") modFiles
       luaRes = header ++ luaMods
    in intercalate "\n" luaRes
 
@@ -104,8 +114,12 @@ getConfig confFile = do
   home <- getHomeDirectory
   file <- decodeFileEither (replaceHome home confFile) :: IO (Either ParseException ModConfig)
   case file of
-    Left err -> error $ " ** Config Error.\n>> Ensure that the config is in the specified directory \n\n [Error] : \n  >>" ++ prettyPrintParseException err
+    Left err -> error $ " ** Config Error.\n>> Ensure that the config is in the specified directory and the config format and indendation is correct\n\n [Error] : \n  >>" ++ prettyPrintParseException err
     Right modConf -> return modConf
+
+sanitizeMod :: String -> String -> (String, String)
+sanitizeMod modHead "." = (init modHead, "")
+sanitizeMod _ modName = (modName, modName ++ ".")
 
 sanitizePath :: ModConfig -> Maybe ModConfig
 sanitizePath ModConfig {modPath, resFile, modules} =
@@ -136,3 +150,11 @@ fromMaybeConfig :: Maybe ModConfig -> ModConfig
 fromMaybeConfig = \case
   Just mod -> mod
   Nothing -> error "Unable to parse Config .Please Ensure that the config contains required fields\n"
+
+getVersion :: Bool -> IO ()
+getVersion value
+  | value =
+    do
+      putStrLn $format . bold . F.cyan . read $ "\tVmod Version : 1.5.0\n"
+      exitSuccess
+  | otherwise = return ()

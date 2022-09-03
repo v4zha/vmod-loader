@@ -21,8 +21,21 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 **Eg:**
 
  ```bash
-    vmod --cfg ./v4zha.yml
+  #Displays Vmod version
+
+    vmod -v
+
+    vmod --version
  ```
+
+ ```bash
+  #Reads config file
+
+    vmod --cfg ./v4zha.yml
+    
+    vmod -f ./v4zha.yml
+ ```
+
 - Default config location ~/.config/vmod/vmod.yml
 - required config fields 
 
@@ -37,9 +50,11 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
      #List the modules
      #Eg : 
      modules : 
-       - colorsheme
+       - general
        - plugins
        - plugin_config
+       # reads the mod_path for lua scripts : )
+       - .
 ```
 <br>
 
@@ -57,4 +72,4 @@ to run the binary with arguments in cabal
 
 ```bash
   cabal run vmod -- --cfg /location/to/config.yml
-```
+  cabal run vmod -- -f /location/to/config.yml```
