@@ -9,7 +9,7 @@ res_file:
 #Eg : 
 modules : 
       - general 
-      #  - plugins
+      - keymaps 
       - plugin_config
       # reads the mod_path for lua scripts : )
       - .
