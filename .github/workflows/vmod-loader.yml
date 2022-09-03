@@ -43,6 +43,3 @@ jobs:
 
     - name: Run tests
       run: cabal test all
-
-    - name: Get Artifact
-      run: 
