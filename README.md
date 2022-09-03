@@ -23,9 +23,10 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
  ```bash
   #Displays Vmod version
 
-    vmod -v
+    vmod -v 
 
-    vmod --version
+    #q flag to suppress Vmodbanner
+    vmod --version -q
  ```
 
  ```bash
@@ -33,7 +34,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 
     vmod --cfg ./v4zha.yml
     
-    vmod -f ./v4zha.yml
+    vmod -f --quiet ./v4zha.yml
  ```
 
 - Default config location ~/.config/vmod/vmod.yml
@@ -72,7 +73,7 @@ to run the binary with arguments in cabal
 
 ```bash
   cabal run vmod -- --cfg /location/to/config.yml
-  cabal run vmod -- -f /location/to/config.yml
+  cabal run vmod -- -f -q /location/to/config.yml
 ```
 
 ## Test
