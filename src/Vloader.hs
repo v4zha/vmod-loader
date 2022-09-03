@@ -31,7 +31,7 @@ data ModConfig = ModConfig
     resFile :: String,
     modules :: [String]
   }
-  deriving (Eq)
+  deriving (Show,Eq)
 
 type ModName = String
 
