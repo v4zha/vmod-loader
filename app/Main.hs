@@ -8,7 +8,7 @@ import Text.Termcolor (format)
 import qualified Text.Termcolor.Foreground as F
 import Text.Termcolor.Style (bold)
 import Vloader
-  ( Config (confFile, quiet, version),
+  ( Config (allMod, confFile, quiet, version),
     ModConfig (ModConfig, modPath, modules, resFile),
     config,
     fromMaybeConfig,
@@ -17,6 +17,7 @@ import Vloader
     getConfig,
     getMods,
     getOpts,
+    getReqMods,
     getVersion,
     replaceHome,
     sanitizeMod,
@@ -36,9 +37,10 @@ main = greeter =<< execParser opts
         home <- getHomeDirectory
         modLs <- sanitizePath <$> getConfig (confFile config)
         let modConf = fromMaybeConfig modLs
-            [res, mods] = replaceHome home <$> [resFile modConf, modPath modConf]
+            [res, modP] = replaceHome home <$> [resFile modConf, modPath modConf]
         putStrLn . format . bold . F.yellow . read $ "[*] : Getting Modules : "
-        mapM_ (putStrLn . format . bold . F.cyan . read . ("   >> " ++) . fst . sanitizeMod "<.> ") . modules $modConf
-        luaMods <- mapM (getMods mods) . modules $modConf
+        reqMods <- getReqMods (allMod config) modP (modules modConf)
+        mapM_ (putStrLn . format . bold . F.cyan . read . ("   >> " ++) . fst . sanitizeMod "<.> ") $reqMods
+        luaMods <- mapM (getMods modP) $reqMods
         putStrLn . format . bold . F.green . read $ "[*] : Writing to file : " ++ res ++ ".lua"
         writeMods luaMods res

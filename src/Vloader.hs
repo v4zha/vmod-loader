@@ -18,7 +18,7 @@ import GHC.Generics (Datatype (moduleName))
 import GHC.IO.Exception (IOException (IOError))
 import GHC.TypeLits (ErrorMessage)
 import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, info, long, metavar, progDesc, short, strOption, switch, value, (<**>))
-import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents, getHomeDirectory)
+import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents, getHomeDirectory, getXdgDirectoryList, listDirectory)
 import System.Exit (exitSuccess)
 import System.FilePath ()
 import System.IO ()
@@ -28,9 +28,9 @@ import Text.Termcolor.Style (bold)
 import Vbanner (vModBanner)
 
 data ModConfig = ModConfig
-  { modPath :: String,
-    resFile :: String,
-    modules :: [String]
+  { modPath :: FilePath,
+    resFile :: FilePath,
+    modules :: [FilePath]
   }
   deriving (Show, Eq)
 
@@ -98,6 +98,18 @@ getMods modPath modName = do
   case dirFiles of
     Right mods -> modGen modPrefix modName mdPath mods
     Left err -> "" <$ (putStrLn . format . bold . F.red . read $("\nError parsing Module : " ++ modName ++ "\n>> [Error]: " ++ show err ++ "\n"))
+
+getReqMods :: Bool -> FilePath -> [FilePath] -> IO [FilePath]
+getReqMods False _ modules = return modules
+getReqMods True modP modules = do
+  modLs <- listDirectory modP
+  mods <- filterM filterMod modLs
+  return $mods ++ ["."]
+  where
+    filterMod :: FilePath -> IO Bool
+    filterMod mod
+      | ".nvim" `isSuffixOf` mod = return False
+      | otherwise = doesDirectoryExist $modP ++ "/" ++ mod
 
 modGen :: String -> String -> FilePath -> [FilePath] -> IO String
 modGen modPrefix modN mdPath dirFiles = do
