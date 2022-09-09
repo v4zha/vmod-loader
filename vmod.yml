@@ -10,6 +10,6 @@ res_file:
 modules : 
       - general 
       - keymaps 
-      - plugin_config
+      - plugins
       # reads the mod_path for lua scripts : )
       - .

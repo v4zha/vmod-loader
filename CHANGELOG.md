@@ -1,9 +1,4 @@
 ### Added
 
-- Added Module insertion from ModPath folder
-- Added version and quiet flags
-
-### Fixes
-
-- Terminal Colors
-- Relative Paths
+- Added AutoAdd directories with init.lua as Modules
+- Added all flag to AutoAdd all modules in mod_path and ignore the modules section in config

@@ -40,7 +40,7 @@ main = greeter =<< execParser opts
             [res, modP] = replaceHome home <$> [resFile modConf, modPath modConf]
         putStrLn . format . bold . F.yellow . read $ "[*] : Getting Modules : "
         reqMods <- getReqMods (allMod config) modP (modules modConf)
-        mapM_ (putStrLn . format . bold . F.cyan . read . ("   >> " ++) . fst . sanitizeMod "<.> ") $reqMods
-        luaMods <- mapM (getMods modP) $reqMods
+        mapM_ (putStrLn . format . bold . F.cyan . read . ("   >> " ++) . fst . sanitizeMod "<.> ") reqMods
+        luaMods <- mapM (getMods modP) reqMods
         putStrLn . format . bold . F.green . read $ "[*] : Writing to file : " ++ res ++ ".lua"
         writeMods luaMods res

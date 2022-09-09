@@ -40,6 +40,15 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 - Default config location ~/.config/vmod/vmod.yml
 - required config fields 
 
+ ```bash
+  #Ignores the modules section and finds all modules in mod_path
+  
+    vmod -a 
+
+    vmod --all
+ ```
+- Ignores the modules section in the config and auto add all modules in mod_path
+
 ```yml
      #Path where Neovim lua modules are located
      #Eg : ~/.config/nvim/lua/v4zha
@@ -53,7 +62,7 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
      modules : 
        - general
        - keymaps
-       - plugin_config
+       - plugins
        # reads the mod_path for lua scripts : )
        - .
 ```
@@ -71,11 +80,12 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
        │       │  ├──  📄 terminal.lua
        │       │  └──  📄 general.lua
        │       │
-       │       ├──📂 plugin_config
+       │       ├──📂 plugins
        │       │  ├── 📄 telescope.lua
        │       │  └── 📄 toggleterm.lua
-       │       │
-       │       └── 📄 plugins.lua
+       │       │  └── 📂 treesitter
+       │       │      └── 📄 init.lua
+       │       └── 📄 plugin.lua
        │
        └── 📄 init.lua 
 ```
@@ -100,8 +110,9 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
       -- ==============================
       --    MOD : plugin_config
       -- ==============================
-      require("v4zha.plugin_config.toggleterm")
-      require("v4zha.plugin_config.telescope")
+      require("v4zha.plugins.toggleterm")
+      require("v4zha.plugins.telescope")
+      require("v4zha.plugins.treesitter")
       -- ==============================
       --    MOD : v4zha
       -- ==============================
@@ -112,6 +123,8 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 <br>
 
 ## Installation
+- Download and run installation script [install.sh](https://github.com/v4zha/vmod-loader/releases/latest/install.sh)<br>
+OR
 - Download from [releases](https://github.com/v4zha/vmod-loader/releases)<br>
 
 ## Build   
