@@ -7,17 +7,18 @@
 module Vloader where
 
 import Control.Exception (try)
+import Control.Monad (filterM)
 import Data.List (foldl', intercalate, isSuffixOf)
 import Data.String (IsString (fromString))
 import Data.Text (Text, pack, replace, splitOn, stripSuffix, unpack)
 import Data.Text.Lazy (toStrict)
-import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Object), YamlException, decode, decodeFileEither, prettyPrintParseException, (.:))
+import Data.Yaml (FromJSON (parseJSON), ParseException, Value (Bool, Object), YamlException, decode, decodeFileEither, prettyPrintParseException, (.:))
 import GHC.Base (IO (IO))
 import GHC.Generics (Datatype (moduleName))
 import GHC.IO.Exception (IOException (IOError))
 import GHC.TypeLits (ErrorMessage)
 import Options.Applicative (Parser, ParserInfo, fullDesc, header, help, helper, info, long, metavar, progDesc, short, strOption, switch, value, (<**>))
-import System.Directory (getDirectoryContents, getHomeDirectory)
+import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents, getHomeDirectory)
 import System.Exit (exitSuccess)
 import System.FilePath ()
 import System.IO ()
@@ -31,7 +32,7 @@ data ModConfig = ModConfig
     resFile :: String,
     modules :: [String]
   }
-  deriving (Show,Eq)
+  deriving (Show, Eq)
 
 type ModName = String
 
@@ -46,7 +47,8 @@ instance FromJSON ModConfig where
 data Config = Config
   { confFile :: String,
     version :: Bool,
-    quiet :: Bool
+    quiet :: Bool,
+    allMod :: Bool
   }
   deriving (Eq)
 
@@ -70,6 +72,11 @@ config =
           <> short 'q'
           <> help "Doesnot display Banner"
       )
+    <*> switch
+      ( long "all"
+          <> short 'a'
+          <> help "Get all mods in mod_path folder"
+      )
 
 getOpts :: ParserInfo Config
 getOpts =
@@ -77,7 +84,7 @@ getOpts =
     (config <**> helper)
     ( fullDesc
         <> progDesc "VmodLoader is used to bundle lua modules"
-        <> header "V Mod Loader -Lua Module Bundler"
+        <> header "V Mod Loader Lua Module Bundler"
     )
 
 border :: [Char]
@@ -86,19 +93,33 @@ border = concat $ replicate 30 "="
 getMods :: FilePath -> String -> IO String
 getMods modPath modName = do
   let modPrefix = getModPrefix modPath
-  dirFiles <- try . getDirectoryContents $ modPath ++ "/" ++ modName :: IO (Either IOError [FilePath])
+      mdPath = modPath ++ "/" ++ modName
+  dirFiles <- try . getDirectoryContents $ mdPath :: IO (Either IOError [FilePath])
   case dirFiles of
-    Right mods -> return $modGen modPrefix modName mods
+    Right mods -> modGen modPrefix modName mdPath mods
     Left err -> "" <$ (putStrLn . format . bold . F.red . read $("\nError parsing Module : " ++ modName ++ "\n>> [Error]: " ++ show err ++ "\n"))
 
-modGen :: String -> String -> [FilePath] -> String
-modGen modPrefix modN dirFiles =
-  let modFiles = filter (isSuffixOf ".lua") dirFiles
-      (modHead, modName) = sanitizeMod modPrefix modN
+modGen :: String -> String -> FilePath -> [FilePath] -> IO String
+modGen modPrefix modN mdPath dirFiles = do
+  modFiles <- modFilter mdPath dirFiles
+  let (modHead, modName) = sanitizeMod modPrefix modN
       header = ["-- " ++ border, "--    MOD : " ++ modHead, "-- " ++ border]
       luaMods = map (\mod -> "require(\"" ++ modPrefix ++ modName ++ fromMaybeMod (sanitizeLua mod) ++ "\")") modFiles
       luaRes = header ++ luaMods
-   in intercalate "\n" luaRes
+  return $intercalate "\n" luaRes
+
+modFilter :: FilePath -> [FilePath] -> IO [FilePath]
+modFilter mdPath = filterM modFltr
+  where
+    modFltr :: FilePath -> IO Bool
+    modFltr mod
+      | ".lua" `isSuffixOf` mod = return True
+      | otherwise = do
+        dir <- doesDirectoryExist $mdPath ++ "/" ++ mod
+        if dir
+          then do
+            doesFileExist $mdPath ++ "/" ++ mod ++ "/init.lua"
+          else return False
 
 writeMods :: [ModName] -> String -> IO ()
 writeMods luaMods resFile =
@@ -141,7 +162,9 @@ sanitizePath ModConfig {modPath, resFile, modules} =
     resF >>= (\res -> Just $ ModConfig mdP res modules)
 
 sanitizeLua :: String -> Maybe ModName
-sanitizeLua modFile = unpack <$> stripSuffix ".lua" (fromString modFile)
+sanitizeLua modFile
+  | ".lua" `isSuffixOf` modFile = unpack <$> stripSuffix ".lua" (fromString modFile)
+  | otherwise = Just modFile
 
 replaceHome :: FilePath -> FilePath -> FilePath
 replaceHome home confPath =
@@ -163,12 +186,10 @@ getVersion :: Bool -> Bool -> IO ()
 getVersion True q =
   do
     let version = "1.5.0"
-    case q of
-      False -> putStrLn $format . bold . F.cyan . read $ "\tVmod Version : " ++ version ++ "\n"
-      True -> putStrLn version
+    if q then putStrLn version else putStrLn $format . bold . F.cyan . read $ "\tVmod Version : " ++ version ++ "\n"
     exitSuccess
 getVersion False _ = return ()
 
 getBanner :: Bool -> IO ()
 getBanner False = putStrLn . format . bold $ read vModBanner
-getBanner  _= return ()
+getBanner _ = return ()

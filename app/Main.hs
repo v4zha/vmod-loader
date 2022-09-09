@@ -36,7 +36,7 @@ main = greeter =<< execParser opts
         home <- getHomeDirectory
         modLs <- sanitizePath <$> getConfig (confFile config)
         let modConf = fromMaybeConfig modLs
-        let [res, mods] = replaceHome home <$> [resFile modConf, modPath modConf]
+            [res, mods] = replaceHome home <$> [resFile modConf, modPath modConf]
         putStrLn . format . bold . F.yellow . read $ "[*] : Getting Modules : "
         mapM_ (putStrLn . format . bold . F.cyan . read . ("   >> " ++) . fst . sanitizeMod "<.> ") . modules $modConf
         luaMods <- mapM (getMods mods) . modules $modConf
