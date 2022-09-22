@@ -12,7 +12,7 @@ printf "Installing vmodLoader : \n"
 
 printf "Getting Vmod : \n"
 
-if [ -d "~/.local/bin" ]
+if [ ! -d "~/.local/bin" ]
 then
     mkdir ~/.local/bin
 fi
@@ -22,7 +22,7 @@ chmod +x ~/.local/bin/vmod
 
 printf "Getting Vmod Default Config : \n"
 
-if [ -d "~/.config/vmod" ]
+if [ ! -d "~/.config/vmod" ]
 then
     mkdir ~/.config/vmod
 fi
