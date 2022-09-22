@@ -125,6 +125,12 @@ Vazha Mod Loader provides a fast bundler which looks for modules descibed in the
 ## Installation
 - Download and run installation script [install.sh](https://github.com/v4zha/vmod-loader/releases/latest/download/install.sh)<br>
 OR
+- Run the following commands 
+```bash
+curl -L  https://github.com/v4zha/vmod-loader/releases/latest/download/install.sh > /tmp/install.sh
+chmod +x /tmp/install.sh
+/tmp/install.sh
+```
 - Download from [releases](https://github.com/v4zha/vmod-loader/releases)<br>
 
 ## Build   
